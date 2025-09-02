@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Moon, Sun, User } from "lucide-react";
+import { User } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 import IconCheck from "/public/images/icon-nobg.png";
 
 export default function Navbar() {
-  const [darkMode, setDarkMode] = useState(true);
   const [openMenu, setOpenMenu] = useState(false);
   const [activeLink, setActiveLink] = useState("Sobre");
 
@@ -23,9 +22,9 @@ export default function Navbar() {
         layout
         className="flex items-center justify-between gap-6 
           px-6 py-2 rounded-full
-          backdrop-blur-xl bg-neutral-900/45 dark:bg-black/30 
+          backdrop-blur-xl bg-neutral-100/20  
           shadow-[0_4px_30px_rgba(0,0,0,0.1)]
-          border border-white/20 dark:border-white/10"
+          border border-neutral-100/20"
       >
         {/* Logo */}
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -39,7 +38,7 @@ export default function Navbar() {
         </motion.div>
 
         {/* Links */}
-        <div className="flex items-center gap-0.5 text-neutral-100 relative">
+        <div className="flex items-center gap-0.5 text-slate-900 relative">
           {["Sobre", "Planos", "Contato"].map((item) => (
             <motion.button
               key={item}
@@ -61,15 +60,7 @@ export default function Navbar() {
         </div>
 
         {/* Ícones */}
-        <div className="ml-3 flex items-center gap-0.5 text-neutral-100">
-          {/* Dark mode toggle */}
-          <motion.button
-            whileTap={{ rotate: 180, scale: 0.9 }}
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-full hover:bg-white/20 transition"
-          >
-            {darkMode ? <Moon size={20} /> : <Sun size={20} />}
-          </motion.button>
+        <div className="ml-3 flex items-center gap-0.5 text-slate-900">
 
           {/* User menu */}
           <div className="relative">
@@ -89,8 +80,8 @@ export default function Navbar() {
                   exit={{ opacity: 0, scale: 0.9, y: 10 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   className="absolute bottom-16 mt-2 w-40 
-                    rounded-xl bg-neutral-900/35 text-neutral-100 text-sm
-                    backdrop-blur-md border border-white/10 shadow-lg"
+                    rounded-xl bg-neutral-100/20 text-slate-900 text-sm
+                    backdrop-blur-xl border border-white/10 shadow-lg"
                 >
                   <motion.button
                     whileHover={{ backgroundColor: "rgba(255,255,255,0.2)" }}
