@@ -5,3 +5,7 @@ body {
   font-family: "inter", sans-serif;
   scroll-behavior: smooth;
 }
+
+.bg-global {
+  @apply bg-gradient-to-br from-neutral-50 via-sky-50 to-blue-200
+}
