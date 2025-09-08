@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -11,34 +11,41 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { ChevronDown } from "lucide-react";
 
-/** Paleta Timely (aprox. da hero) */
+/** Paleta Timely */
 const COLORS = {
-  navy: "#0B1B2F", // dark navy
-  blue: "#4F7DFF", // primary
-  text: "#111827", // slate-900-ish
-  textMuted: "#6B7280", // slate-500-ish
-  card: "rgba(255,255,255,0.9)",
+  navy: "#0B1B2F",
+  blue: "#4F7DFF",
+  text: "#111827",
+  textMuted: "#6B7280",
+  card: "rgba(255,255,255,0.95)",
   border: "rgba(15,23,42,0.06)",
 };
 
-type Event = {
-  id: string;
+/* ------------------------------- Tipos e Dados ------------------------------- */
+
+type CalendarEvent = {
+  day: number;
   title: string;
   time: string;
-  color: string;
-  col: number;
-  row: number;
 };
 
-const eventsData: Event[] = [
-  { id: "1", title: "Entrevista", time: "9:00 — 10:00", color: "#6690FF", col: 2, row: 2 },
-  { id: "2", title: "Almoço com Juliana", time: "12:00 — 13:00", color: "#34C759", col: 4, row: 4 },
-  { id: "3", title: "Reunião de projeto", time: "14:00 — 15:30", color: "#7C66FF", col: 2, row: 5 },
-  { id: "4", title: "Design review", time: "16:00 — 17:00", color: "#FF8A3D", col: 5, row: 6 },
+const calendarEvents: CalendarEvent[] = [
+  { day: 2, title: "Entrevista", time: "09:00 — 10:00" },
+  { day: 2, title: "Briefing de Design", time: "11:00 — 11:30" },
+  { day: 4, title: "Almoço com Juliana", time: "12:00 — 13:00" },
+  { day: 5, title: "Reunião de projeto", time: "14:00 — 15:30" },
+  { day: 6, title: "Design review", time: "16:00 — 17:00" },
 ];
 
-/** Dados fictícios de agendamentos por mês */
 const chartData = [
   { month: "Jan", agendamentos: 10 },
   { month: "Fev", agendamentos: 14 },
@@ -54,9 +61,11 @@ const chartData = [
   { month: "Dez", agendamentos: 32 },
 ];
 
+/* ------------------------------- Componente Principal ------------------------------- */
+
 export default function DashboardExample() {
-  const days = useMemo(() => ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"], []);
-  const hours = useMemo(() => ["", "9", "11", "12", "13", "14", "16", "18"], []);
+  const [selectedMonth, setSelectedMonth] = useState(11); // Dezembro
+  const [selectedYear, setSelectedYear] = useState(2025);
 
   return (
     <section className="min-h-screen flex items-center justify-center">
@@ -106,7 +115,9 @@ export default function DashboardExample() {
                 />
               </div>
               <div>
-                <p className="text-neutral-200 font-medium leading-tight">John Doe</p>
+                <p className="text-neutral-200 font-medium leading-tight">
+                  John Doe
+                </p>
                 <p className="text-neutral-200/60 text-sm">Premium</p>
               </div>
             </div>
@@ -116,7 +127,9 @@ export default function DashboardExample() {
           <main className="flex-1 p-6 space-y-6 overflow-auto">
             {/* Header */}
             <header className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">Dezembro, 2025</h1>
+              <h1 className="text-2xl font-bold">
+                Seu Calendário
+              </h1>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 className="
@@ -138,29 +151,64 @@ export default function DashboardExample() {
               {/* Calendário */}
               <div
                 className="col-span-2 rounded-2xl p-6"
-                style={{ background: COLORS.card, border: `1px solid ${COLORS.border}` }}
+                style={{
+                  background: COLORS.card,
+                  border: `1px solid ${COLORS.border}`,
+                }}
               >
-                <InfoHeader />
-                <div className="mt-4 grid grid-cols-7 gap-2">
-                  {days.map((d) => (
-                    <p
-                      key={d}
-                      className="text-sm font-medium text-center"
-                      style={{ color: COLORS.textMuted }}
-                    >
-                      {d}
-                    </p>
-                  ))}
-                  {Array.from({ length: 35 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-20 border border-dashed rounded-lg flex items-center justify-center text-sm"
-                      style={{ borderColor: COLORS.border, color: COLORS.textMuted }}
-                    >
-                      {i < 30 ? i + 1 : ""}
-                    </div>
-                  ))}
+                {/* Cabeçalho Mês/Ano refinado */}
+                <div className="flex items-center justify-between mb-4">
+                  {/* Mês */}
+                  <Select
+                    onValueChange={(value) => setSelectedMonth(Number(value))}
+                    defaultValue={selectedMonth.toString()}
+                  >
+                    <SelectTrigger className="flex items-center gap-1 px-4 py-2 bg-gray-100/70 backdrop-blur-md rounded-xl font-medium shadow-sm w-fit hover:bg-gray-200/70 transition">
+                      <SelectValue placeholder="Mês" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-xl animate-in fade-in-50 zoom-in-95">
+                      {[
+                        "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+                        "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+                      ].map((m, index) => (
+                        <SelectItem
+                          key={index}
+                          value={index.toString()}
+                          className="hover:bg-blue-100/60 rounded-md px-2 py-1 cursor-pointer transition"
+                        >
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Ano */}
+                  <Select
+                    onValueChange={(value) => setSelectedYear(Number(value))}
+                    defaultValue={selectedYear.toString()}
+                  >
+                    <SelectTrigger className="flex items-center gap-1 px-4 py-2 bg-gray-100/70 backdrop-blur-md rounded-xl font-medium shadow-sm w-fit hover:bg-gray-200/70 transition">
+                      <SelectValue placeholder="Ano" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-xl animate-in fade-in-50 zoom-in-95">
+                      {Array.from({ length: 6 }).map((_, i) => {
+                        const y = 2023 + i;
+                        return (
+                          <SelectItem
+                            key={y}
+                            value={y.toString()}
+                            className="hover:bg-blue-100/60 rounded-md px-2 py-1 cursor-pointer transition"
+                          >
+                            {y}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                {/* Calendário */}
+                <CalendarGrid month={selectedMonth} year={selectedYear} />
               </div>
 
               {/* Estatísticas */}
@@ -170,8 +218,6 @@ export default function DashboardExample() {
                   value="12"
                   subtitle="+3 em relação ao mês passado"
                 />
-
-                {/* Novo gráfico de linhas */}
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -210,7 +256,6 @@ export default function DashboardExample() {
                     </ResponsiveContainer>
                   </div>
                 </motion.div>
-
                 <StatCard
                   title="Reuniões concluídas"
                   value="9"
@@ -270,34 +315,86 @@ function SidebarItem({
   );
 }
 
-function InfoHeader() {
+function InfoHeader({
+  month,
+  year,
+  onMonthChange,
+  onYearChange,
+}: {
+  month: number;
+  year: number;
+  onMonthChange: (m: number) => void;
+  onYearChange: (y: number) => void;
+}) {
+  const months = [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro",
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl p-3 flex items-center justify-between"
+      className="rounded-2xl p-3 flex items-center justify-between gap-4"
       style={{
         background: COLORS.card,
         border: `1px solid ${COLORS.border}`,
       }}
     >
-      <div
-        className="px-3 py-2 rounded-xl text-sm font-semibold"
-        style={{ background: "rgba(79,125,255,0.12)", color: COLORS.navy }}
+      <button
+        className="px-3 py-1 rounded-lg text-white"
+        style={{ background: COLORS.blue }}
+        onClick={() => onMonthChange((month - 1 + 12) % 12)}
       >
-        Dezembro
+        {"<"}
+      </button>
+      <div className="flex items-center gap-3">
+        <span className="font-semibold">{months[month]}</span>
+        <select
+          value={year}
+          onChange={(e) => onYearChange(Number(e.target.value))}
+          className="border rounded-lg px-2 py-1 text-sm"
+        >
+          {Array.from({ length: 6 }).map((_, i) => {
+            const y = 2023 + i;
+            return (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            );
+          })}
+        </select>
       </div>
-      <div
-        className="px-3 py-2 rounded-xl text-sm font-semibold"
-        style={{ background: "rgba(79,125,255,0.12)", color: COLORS.navy }}
+      <button
+        className="px-3 py-1 rounded-lg text-white"
+        style={{ background: COLORS.blue }}
+        onClick={() => onMonthChange((month + 1) % 12)}
       >
-        2025
-      </div>
+        {">"}
+      </button>
     </motion.div>
   );
 }
 
-function StatCard({ title, value, subtitle }: { title: string; value: string; subtitle: string }) {
+function StatCard({
+  title,
+  value,
+  subtitle,
+}: {
+  title: string;
+  value: string;
+  subtitle: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -320,5 +417,119 @@ function StatCard({ title, value, subtitle }: { title: string; value: string; su
         {subtitle}
       </p>
     </motion.div>
+  );
+}
+
+/* ---------------- Calendar with Modal ---------------- */
+
+function CalendarGrid({ month, year }: { month: number; year: number }) {
+  const [hoveredEvent, setHoveredEvent] = useState<CalendarEvent | null>(null);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  return (
+    <div className="mt-4 grid grid-cols-7 gap-2 relative">
+      {/* Cabeçalho (dias da semana) */}
+      {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map((d) => (
+        <p
+          key={d}
+          className="text-sm font-medium text-center"
+          style={{ color: COLORS.textMuted }}
+        >
+          {d}
+        </p>
+      ))}
+
+      {/* Dias */}
+      {Array.from({ length: daysInMonth }).map((_, i) => {
+        const dayNumber = i + 1;
+        const events = calendarEvents.filter((e) => e.day === dayNumber);
+        const event = events[0];
+
+        return (
+          <div
+            key={i}
+            className={`h-20 border border-dashed rounded-lg flex items-center justify-center text-sm relative cursor-pointer`}
+            style={{
+              borderColor: COLORS.border,
+              color: event ? "white" : COLORS.textMuted,
+              background: event ? COLORS.blue : "transparent",
+            }}
+            onMouseEnter={() => event && setHoveredEvent(event)}
+            onMouseLeave={() => setHoveredEvent(null)}
+            onClick={() => setSelectedDay(dayNumber)}
+          >
+            {dayNumber}
+
+            {/* Popover (hover) */}
+            {hoveredEvent?.day === dayNumber && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 p-3 rounded-xl shadow-lg text-sm"
+                style={{
+                  background: COLORS.card,
+                  border: `1px solid ${COLORS.border}`,
+                  color: COLORS.text,
+                  minWidth: "180px",
+                }}
+              >
+                <p className="font-semibold">{hoveredEvent.title}</p>
+                <p className="text-xs text-gray-500">{hoveredEvent.time}</p>
+              </motion.div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Modal de eventos do dia */}
+      <AnimatePresence>
+        {selectedDay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+            >
+              <h2 className="text-lg font-bold mb-4">
+                Eventos do dia {selectedDay}
+              </h2>
+              {calendarEvents.filter((e) => e.day === selectedDay).length > 0 ? (
+                <ul className="space-y-3">
+                  {calendarEvents
+                    .filter((e) => e.day === selectedDay)
+                    .map((ev, idx) => (
+                      <li
+                        key={idx}
+                        className="p-3 rounded-lg border"
+                        style={{ borderColor: COLORS.border }}
+                      >
+                        <p className="font-medium">{ev.title}</p>
+                        <p className="text-sm text-gray-500">{ev.time}</p>
+                      </li>
+                    ))}
+                </ul>
+              ) : (
+                <p className="text-gray-500">Nenhum evento neste dia.</p>
+              )}
+              <button
+                onClick={() => setSelectedDay(null)}
+                className="mt-6 w-full py-2 rounded-lg text-white"
+                style={{ background: COLORS.blue }}
+              >
+                Fechar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
