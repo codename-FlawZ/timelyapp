@@ -1,22 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 import IconCheck from "/public/images/icon-nobg.png";
 
-export default function Navbar() {
+export default function Navbar({ heroRef }: { heroRef: React.RefObject<HTMLElement> }) {
+  const [showNavbar, setShowNavbar] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [activeLink, setActiveLink] = useState("Sobre");
+
+  useEffect(() => {
+    if (!heroRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // se menos de 80% do hero estiver visível, mostrar a navbar
+        setShowNavbar(entry.intersectionRatio < 0.8);
+      },
+      {
+        threshold: Array.from({ length: 101 }, (_, i) => i / 100), // de 0.00 até 1.00
+      }
+    );
+
+    observer.observe(heroRef.current);
+
+    return () => {
+      if (heroRef.current) observer.unobserve(heroRef.current);
+    };
+  }, [heroRef]);
 
   return (
     <motion.nav
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+      className={`fixed bottom-6 left-1/2 transition-opacity duration-150 -translate-x-1/2 z-50 ${
+        showNavbar ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+      style={{ zIndex: 1000 }}
     >
       <motion.div
         layout
@@ -61,7 +85,6 @@ export default function Navbar() {
 
         {/* Ícones */}
         <div className="ml-3 flex items-center gap-0.5 text-slate-900">
-
           {/* User menu */}
           <div className="relative">
             <motion.button

@@ -1,17 +1,27 @@
 "use client";
 
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import GlassTag from "../ui/GlassTag";
 import Calendar from "../ui/Calendar";
+import Navbar from "../ui/Navbar";
 
 export default function Hero() {
+  const heroRef = useRef<HTMLElement | null>(null);
+
   return (
-    <section className="relative w-full min-h-screen  px-6 md:px-12 lg:px-20 py-7 flex flex-col gap-6">
-      {/* Navbar */}
+    <section
+      ref={heroRef}
+      className="relative w-full min-h-screen px-6 md:px-12 lg:px-20 py-7 flex flex-col gap-6"
+    >
+      {/* Navbar aparece só quando Hero sai da tela */}
+      <Navbar heroRef={heroRef} />
+
+      {/* Header da Hero */}
       <motion.header
         initial={{ y: 0, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
         className="flex justify-between items-center px-6 md:px-10 pb-10"
       >
         <h1 className="text-2xl font-bold text-gray-800">Timely</h1>
@@ -50,7 +60,7 @@ export default function Hero() {
           <h1 className="mt-6 text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">
             <span className="text-slate-600">Organize</span> seu tempo
             <br />
-            de forma {" "}
+            de forma{" "}
             <strong className="text-blue-500 underline">inteligente</strong>.
           </h1>
 
