@@ -1,46 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { User } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 import IconCheck from "/public/images/icon-nobg.png";
 
-export default function Navbar({ heroRef }: { heroRef: React.RefObject<HTMLElement> }) {
+interface NavbarProps {
+  heroRef: React.RefObject<HTMLElement | null>;
+  threshold?: number;
+}
+
+export default function Navbar({ heroRef, threshold = 0.5 }: NavbarProps) {
   const [showNavbar, setShowNavbar] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [activeLink, setActiveLink] = useState("Sobre");
 
   useEffect(() => {
-    if (!heroRef.current) return;
+    const handleScroll = () => {
+      const hero = heroRef.current;
+      if (!hero) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // se menos de 80% do hero estiver visível, mostrar a navbar
-        setShowNavbar(entry.intersectionRatio < 0.8);
-      },
-      {
-        threshold: Array.from({ length: 101 }, (_, i) => i / 100), // de 0.00 até 1.00
-      }
-    );
+      const heroHeight = hero.offsetHeight;
+      const heroBottom = hero.getBoundingClientRect().bottom;
 
-    observer.observe(heroRef.current);
-
-    return () => {
-      if (heroRef.current) observer.unobserve(heroRef.current);
+      setShowNavbar(heroBottom < heroHeight * threshold);
     };
-  }, [heroRef]);
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [heroRef])
 
   return (
     <motion.nav
       initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: showNavbar ? 1 : 0, y: showNavbar ? 0 : 40 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed bottom-6 left-1/2 transition-opacity duration-150 -translate-x-1/2 z-50 ${
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-150 ${
         showNavbar ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
-      style={{ zIndex: 1000 }}
     >
       <motion.div
         layout
@@ -110,13 +110,13 @@ export default function Navbar({ heroRef }: { heroRef: React.RefObject<HTMLEleme
                     whileHover={{ backgroundColor: "rgba(255,255,255,0.2)" }}
                     className="block w-full text-left px-4 py-2"
                   >
-                    Cadastre-se
+                    <Link href="/register">Cadastre-se agora</Link>
                   </motion.button>
                   <motion.button
                     whileHover={{ backgroundColor: "rgba(255,255,255,0.2)" }}
                     className="block w-full text-left px-4 py-2"
                   >
-                    Iniciar sessão
+                    <Link href="/login">Iniciar sessão</Link>
                   </motion.button>
                 </motion.div>
               )}

@@ -1,7 +1,9 @@
-
-import Hero from "./components/sections/Hero";
-import About from "./components/sections/About";
-import Plans from "./components/sections/Plans";
+"use client"
+import Link from "next/link";
+import Hero from "./components/Hero";
+import About from "./components/About";
+import Plans from "./components/Plans";
+import Contact from "./components/Contact";
 
 export default function Home() {
   return (
@@ -9,6 +11,7 @@ export default function Home() {
       <Hero />
       <About />
       <Plans />
+      <Contact />
     </main>
   );
 }

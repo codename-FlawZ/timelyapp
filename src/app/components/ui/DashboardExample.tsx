@@ -17,8 +17,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
-import { ChevronDown } from "lucide-react";
+} from "@/app/components/ui/select";
 
 /** Paleta Timely */
 const COLORS = {
@@ -68,8 +67,22 @@ export default function DashboardExample() {
   const [selectedYear, setSelectedYear] = useState(2025);
 
   return (
-    <section className="min-h-screen flex items-center justify-center">
-      <div className="w-full h-full p-[5%] flex items-center justify-center">
+    <section 
+     className="
+      min-h-screen 
+      flex 
+      items-center 
+      justify-center
+    ">
+      <div 
+       className="
+        w-full 
+        h-full 
+        p-[5%] 
+        flex 
+        items-center 
+        justify-center
+       ">
         <div
           className="
             mx-auto 
@@ -98,16 +111,50 @@ export default function DashboardExample() {
             "
             style={{ background: COLORS.navy }}
           >
-            <div className="flex justify-start items-center pb-30 p-2">
-              <p className="text-neutral-200/60 text-sm">Timely</p>
+            <div 
+             className="
+              flex 
+              justify-start 
+              items-center 
+              pb-30 
+              p-2
+            ">
+              <p 
+               className="
+                text-neutral-200/60 
+                text-sm
+              ">
+                Timely
+              </p>
             </div>
-            <nav className="pb-50 space-y-3">
+            <nav 
+             className="
+              pb-50 
+              space-y-3
+            ">
               <SidebarItem label="Home" active />
               <SidebarItem label="Estatísticas" icon="chart" />
               <SidebarItem label="Usuário" icon="user" />
             </nav>
-            <div className="flex items-center gap-3 p-3">
-              <div className="h-20 w-14 rounded-full flex items-center justify-center text-neutral-200 text-xl font-semibold">
+            <div 
+             className="
+              flex 
+              items-center 
+              gap-3 
+              p-3
+            ">
+              <div 
+               className="
+                h-20 
+                w-14 
+                rounded-full 
+                flex 
+                items-center 
+                justify-center 
+                text-neutral-200 
+                text-xl 
+                font-semibold
+              ">
                 <img
                   src="../images/Jhon-Doe.png"
                   alt="Jhon Doe Picture"
@@ -115,19 +162,45 @@ export default function DashboardExample() {
                 />
               </div>
               <div>
-                <p className="text-neutral-200 font-medium leading-tight">
+                <p 
+                 className="
+                  text-neutral-200 
+                  font-medium 
+                  leading-tight
+                ">
                   John Doe
                 </p>
-                <p className="text-neutral-200/60 text-sm">Premium</p>
+                <p 
+                 className="
+                  text-neutral-200/60 
+                  text-sm
+                ">
+                  Premium
+                </p>
               </div>
             </div>
           </aside>
 
           {/* MAIN */}
-          <main className="flex-1 p-6 space-y-6 overflow-auto">
+          <main 
+           className="
+            flex-1 
+            p-6 
+            space-y-6 
+            overflow-auto
+          ">
             {/* Header */}
-            <header className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">
+            <header 
+             className="
+              flex 
+              justify-between 
+              items-center
+            ">
+              <h1 
+               className="
+                text-2xl 
+                font-bold
+              ">
                 Seu Calendário
               </h1>
               <motion.button
@@ -147,26 +220,69 @@ export default function DashboardExample() {
             </header>
 
             {/* Grid principal: calendário + estatísticas */}
-            <div className="grid grid-cols-3 gap-6">
+            <div 
+             className="
+              grid 
+              grid-cols-3 
+              gap-6
+            ">
               {/* Calendário */}
               <div
-                className="col-span-2 rounded-2xl p-6"
+                className="
+                 col-span-2 
+                 rounded-2xl 
+                 p-6
+                "
                 style={{
                   background: COLORS.card,
                   border: `1px solid ${COLORS.border}`,
                 }}
               >
                 {/* Cabeçalho Mês/Ano refinado */}
-                <div className="flex items-center justify-between mb-4">
+                <div 
+                 className="
+                  flex 
+                  items-center 
+                  justify-between 
+                  mb-4
+                ">
                   {/* Mês */}
                   <Select
                     onValueChange={(value) => setSelectedMonth(Number(value))}
                     defaultValue={selectedMonth.toString()}
                   >
-                    <SelectTrigger className="flex items-center gap-1 px-4 py-2 bg-gray-100/70 backdrop-blur-md rounded-xl font-medium shadow-sm w-fit hover:bg-gray-200/70 transition">
-                      <SelectValue placeholder="Mês" />
+                    <SelectTrigger 
+                     className="
+                      flex 
+                      items-center 
+                      gap-1 
+                      px-4 
+                      py-2 
+                      bg-gray-100/70 
+                      backdrop-blur-md 
+                      rounded-xl 
+                      font-medium 
+                      shadow-sm 
+                      w-fit 
+                      hover:bg-gray-200/70 
+                      transition
+                    ">
+                      <SelectValue 
+                       placeholder="Mês" 
+                      />
                     </SelectTrigger>
-                    <SelectContent className="bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-xl animate-in fade-in-50 zoom-in-95">
+                    <SelectContent 
+                     className="
+                      bg-white/80 
+                      backdrop-blur-md 
+                      border 
+                      border-gray-200 
+                      shadow-lg 
+                      rounded-xl 
+                      animate-in 
+                      fade-in-50 
+                      zoom-in-95
+                     ">
                       {[
                         "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
                         "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
@@ -174,8 +290,14 @@ export default function DashboardExample() {
                         <SelectItem
                           key={index}
                           value={index.toString()}
-                          className="hover:bg-blue-100/60 rounded-md px-2 py-1 cursor-pointer transition"
-                        >
+                          className="
+                           hover:bg-blue-100/60 
+                           rounded-md 
+                           px-2 
+                           py-1 
+                           cursor-pointer 
+                           transition
+                          ">
                           {m}
                         </SelectItem>
                       ))}
@@ -187,18 +309,50 @@ export default function DashboardExample() {
                     onValueChange={(value) => setSelectedYear(Number(value))}
                     defaultValue={selectedYear.toString()}
                   >
-                    <SelectTrigger className="flex items-center gap-1 px-4 py-2 bg-gray-100/70 backdrop-blur-md rounded-xl font-medium shadow-sm w-fit hover:bg-gray-200/70 transition">
+                    <SelectTrigger 
+                     className="
+                      flex 
+                      items-center 
+                      gap-1 
+                      px-4 
+                      py-2 
+                      bg-gray-100/70 
+                      backdrop-blur-md 
+                      rounded-xl 
+                      font-medium 
+                      shadow-sm 
+                      w-fit 
+                      hover:bg-gray-200/70 
+                      transition
+                    ">
                       <SelectValue placeholder="Ano" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white/80 backdrop-blur-md border border-gray-200 shadow-lg rounded-xl animate-in fade-in-50 zoom-in-95">
+                    <SelectContent 
+                     className="
+                      bg-white/80 
+                      backdrop-blur-md 
+                      border 
+                      border-gray-200 
+                      shadow-lg 
+                      rounded-xl 
+                      animate-in 
+                      fade-in-50 
+                      zoom-in-95
+                    ">
                       {Array.from({ length: 6 }).map((_, i) => {
                         const y = 2023 + i;
                         return (
                           <SelectItem
                             key={y}
                             value={y.toString()}
-                            className="hover:bg-blue-100/60 rounded-md px-2 py-1 cursor-pointer transition"
-                          >
+                            className="
+                             hover:bg-blue-100/60 
+                             rounded-md 
+                             px-2 
+                             py-1 
+                             cursor-pointer 
+                             transition
+                             ">
                             {y}
                           </SelectItem>
                         );
@@ -413,7 +567,7 @@ function StatCard({
       <div className="text-4xl font-extrabold" style={{ color: COLORS.navy }}>
         {value}
       </div>
-      <p className="mt-1 text-base" style={{ color: COLORS.text }}>
+      <p className="mt-1 text-base" style={{ color: COLORS.blue }}>
         {subtitle}
       </p>
     </motion.div>
