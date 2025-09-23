@@ -18,7 +18,7 @@ export default function Login() {
                     <div className="login-auth-socials">
                         <FcGoogle />
                     </div>
-                    <div className="login-auth-socials text-neutral-600 hover:text-neutral-200">
+                    <div className="login-auth-socials text-neutral-400 hover:text-neutral-200">
                         <SiApple />
                     </div>
                     <div className="login-auth-socials text-blue-600">
@@ -40,7 +40,7 @@ export default function Login() {
                      className="login-input" />
                 </div>
                 <div className="flex items-center pb-6">
-                    <button className="bg-neutral-900 rounded-xl text-neutral-200 p-4 px-7 text-lg hover:bg-transparent hover:text-neutral-950 transition-colors ease-in-out duration-200 hover:shadow-xl cursor-pointer"><Link href="/">Register now</Link></button>
+                    <button className="bg-blue-600 rounded-xl text-neutral-200 p-4 px-7 text-lg hover:bg-transparent hover:text-neutral-950 transition-colors ease-in-out duration-200 hover:shadow-xl cursor-pointer"><Link href="/">Registre-se</Link></button>
                 </div>
             </div>
             {/* Mobile Verison */}

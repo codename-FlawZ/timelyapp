@@ -10,23 +10,25 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Area,
+  AreaChart,
 } from "recharts";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/app/components/ui/select";
 
-/** Paleta Timely */
+/** Paleta Timely Premium */
 const COLORS = {
   navy: "#0B1B2F",
   blue: "#4F7DFF",
+  blueLight: "#6B8AFF",
   text: "#111827",
   textMuted: "#6B7280",
-  card: "rgba(255,255,255,0.95)",
-  border: "rgba(15,23,42,0.06)",
+  card: "rgba(255,255,255,0.98)",
+  cardHover: "rgba(255,255,255,1)",
+  border: "rgba(15,23,42,0.08)",
+  borderLight: "rgba(15,23,42,0.04)",
+  shadow: "rgba(11,27,47,0.08)",
+  gradient: "linear-gradient(135deg, #4F7DFF 0%, #6B8AFF 100%)",
+  gradientHover: "linear-gradient(135deg, #3F6FEF 0%, #5B7AEF 100%)",
+  accent: "#F8FAFC",
 };
 
 /* ------------------------------- Tipos e Dados ------------------------------- */
@@ -35,396 +37,332 @@ type CalendarEvent = {
   day: number;
   title: string;
   time: string;
+  type: 'meeting' | 'interview' | 'lunch' | 'review';
 };
 
 const calendarEvents: CalendarEvent[] = [
-  { day: 2, title: "Entrevista", time: "09:00 — 10:00" },
-  { day: 2, title: "Briefing de Design", time: "11:00 — 11:30" },
-  { day: 4, title: "Almoço com Juliana", time: "12:00 — 13:00" },
-  { day: 5, title: "Reunião de projeto", time: "14:00 — 15:30" },
-  { day: 6, title: "Design review", time: "16:00 — 17:00" },
+  { day: 2, title: "Entrevista Técnica", time: "09:00 — 10:00", type: 'interview' },
+  { day: 2, title: "Briefing de Design", time: "11:00 — 11:30", type: 'meeting' },
+  { day: 4, title: "Almoço com Juliana", time: "12:00 — 13:00", type: 'lunch' },
+  { day: 5, title: "Reunião de Projeto", time: "14:00 — 15:30", type: 'meeting' },
+  { day: 6, title: "Design Review", time: "16:00 — 17:00", type: 'review' },
+  { day: 12, title: "Sprint Planning", time: "10:00 — 11:30", type: 'meeting' },
+  { day: 15, title: "Client Meeting", time: "15:00 — 16:00", type: 'meeting' },
 ];
 
 const chartData = [
-  { month: "Jan", agendamentos: 10 },
-  { month: "Fev", agendamentos: 14 },
-  { month: "Mar", agendamentos: 8 },
-  { month: "Abr", agendamentos: 18 },
-  { month: "Mai", agendamentos: 22 },
-  { month: "Jun", agendamentos: 16 },
-  { month: "Jul", agendamentos: 25 },
-  { month: "Ago", agendamentos: 20 },
-  { month: "Set", agendamentos: 28 },
-  { month: "Out", agendamentos: 30 },
-  { month: "Nov", agendamentos: 24 },
-  { month: "Dez", agendamentos: 32 },
+  { month: "Jan", agendamentos: 10, meta: 15 },
+  { month: "Fev", agendamentos: 14, meta: 15 },
+  { month: "Mar", agendamentos: 8, meta: 15 },
+  { month: "Abr", agendamentos: 18, meta: 20 },
+  { month: "Mai", agendamentos: 22, meta: 25 },
+  { month: "Jun", agendamentos: 16, meta: 20 },
+  { month: "Jul", agendamentos: 25, meta: 25 },
+  { month: "Ago", agendamentos: 20, meta: 25 },
+  { month: "Set", agendamentos: 28, meta: 30 },
+  { month: "Out", agendamentos: 30, meta: 30 },
+  { month: "Nov", agendamentos: 24, meta: 25 },
+  { month: "Dez", agendamentos: 32, meta: 30 },
 ];
 
 /* ------------------------------- Componente Principal ------------------------------- */
 
-export default function DashboardExample() {
-  const [selectedMonth, setSelectedMonth] = useState(11); // Dezembro
+export default function PremiumDashboard() {
+  const [selectedMonth, setSelectedMonth] = useState(11);
   const [selectedYear, setSelectedYear] = useState(2025);
+  const [hoveredStat, setHoveredStat] = useState<number | null>(null);
 
   return (
-    <section 
-     className="
-      min-h-screen 
-      flex 
-      items-center 
-      justify-center
-    ">
-      <div 
-       className="
-        w-full 
-        h-full 
-        p-[5%] 
-        flex 
-        items-center 
-        justify-center
-       ">
-        <div
-          className="
-            mx-auto 
-            max-w-[1200px] 
-            w-full 
-            transform 
-            scale-90 md:scale-95 
-            rounded-3xl 
-            overflow-hidden 
-            shadow-[0_20px_60px_rgba(0,0,0,0.1)]
-            flex
-          "
-          style={{
-            background: COLORS.card,
-            border: `1px solid ${COLORS.border}`,
-          }}
-        >
-          {/* Sidebar */}
-          <aside
-            className="
-              w-[240px] 
-              shrink-0 
-              p-6 
-              flex 
-              flex-col
-            "
-            style={{ background: COLORS.navy }}
+    <div 
+      className="min-h-screen relative overflow-hidden"
+    >
+      <section className="min-h-screen flex items-center justify-center relative z-10 p-4">
+        <div className="w-full max-w-[1200px] flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="w-full h-[700px] rounded-2xl overflow-hidden flex"
+            style={{
+              background: COLORS.card,
+              border: `1px solid ${COLORS.border}`,
+              boxShadow: `0 20px 60px rgba(11,27,47,0.12)`,
+            }}
           >
-            <div 
-             className="
-              flex 
-              justify-start 
-              items-center 
-              pb-30 
-              p-2
-            ">
-              <p 
-               className="
-                text-neutral-200/60 
-                text-sm
-              ">
-                Timely
-              </p>
-            </div>
-            <nav 
-             className="
-              pb-50 
-              space-y-3
-            ">
-              <SidebarItem label="Home" active />
-              <SidebarItem label="Estatísticas" icon="chart" />
-              <SidebarItem label="Usuário" icon="user" />
-            </nav>
-            <div 
-             className="
-              flex 
-              items-center 
-              gap-3 
-              p-3
-            ">
-              <div 
-               className="
-                h-20 
-                w-14 
-                rounded-full 
-                flex 
-                items-center 
-                justify-center 
-                text-neutral-200 
-                text-xl 
-                font-semibold
-              ">
-                <img
-                  src="../images/Jhon-Doe.png"
-                  alt="Jhon Doe Picture"
-                  className="rounded-full"
-                />
-              </div>
-              <div>
-                <p 
-                 className="
-                  text-neutral-200 
-                  font-medium 
-                  leading-tight
-                ">
-                  John Doe
-                </p>
-                <p 
-                 className="
-                  text-neutral-200/60 
-                  text-sm
-                ">
-                  Premium
-                </p>
-              </div>
-            </div>
-          </aside>
-
-          {/* MAIN */}
-          <main 
-           className="
-            flex-1 
-            p-6 
-            space-y-6 
-            overflow-auto
-          ">
-            {/* Header */}
-            <header 
-             className="
-              flex 
-              justify-between 
-              items-center
-            ">
-              <h1 
-               className="
-                text-2xl 
-                font-bold
-              ">
-                Seu Calendário
-              </h1>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                className="
-                  px-4
-                  py-2
-                  rounded-xl
-                  text-white
-                  font-medium
-                  shadow-md
-                "
-                style={{ background: COLORS.blue }}
+            {/* Sidebar Premium */}
+            <motion.aside
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="w-[250px] shrink-0 p-6 flex flex-col relative overflow-hidden"
+              style={{ 
+                background: `linear-gradient(180deg, ${COLORS.navy} 0%, #0F1F33 100%)`,
+              }}
+            >
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+              
+              {/* Logo */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex justify-start items-center pb-8 relative z-10"
               >
-                Adicionar Evento
-              </motion.button>
-            </header>
-
-            {/* Grid principal: calendário + estatísticas */}
-            <div 
-             className="
-              grid 
-              grid-cols-3 
-              gap-6
-            ">
-              {/* Calendário */}
-              <div
-                className="
-                 col-span-2 
-                 rounded-2xl 
-                 p-6
-                "
-                style={{
-                  background: COLORS.card,
-                  border: `1px solid ${COLORS.border}`,
-                }}
-              >
-                {/* Cabeçalho Mês/Ano refinado */}
-                <div 
-                 className="
-                  flex 
-                  items-center 
-                  justify-between 
-                  mb-4
-                ">
-                  {/* Mês */}
-                  <Select
-                    onValueChange={(value) => setSelectedMonth(Number(value))}
-                    defaultValue={selectedMonth.toString()}
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
+                    style={{ background: COLORS.gradient }}
                   >
-                    <SelectTrigger 
-                     className="
-                      flex 
-                      items-center 
-                      gap-1 
-                      px-4 
-                      py-2 
-                      bg-gray-100/70 
-                      backdrop-blur-md 
-                      rounded-xl 
-                      font-medium 
-                      shadow-sm 
-                      w-fit 
-                      hover:bg-gray-200/70 
-                      transition
-                    ">
-                      <SelectValue 
-                       placeholder="Mês" 
+                    <svg width="20" height="20" viewBox="0 0 24 24" className="text-white">
+                      <path
+                        fill="currentColor"
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
                       />
-                    </SelectTrigger>
-                    <SelectContent 
-                     className="
-                      bg-white/80 
-                      backdrop-blur-md 
-                      border 
-                      border-gray-200 
-                      shadow-lg 
-                      rounded-xl 
-                      animate-in 
-                      fade-in-50 
-                      zoom-in-95
-                     ">
-                      {[
-                        "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-                        "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-                      ].map((m, index) => (
-                        <SelectItem
-                          key={index}
-                          value={index.toString()}
-                          className="
-                           hover:bg-blue-100/60 
-                           rounded-md 
-                           px-2 
-                           py-1 
-                           cursor-pointer 
-                           transition
-                          ">
-                          {m}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* Ano */}
-                  <Select
-                    onValueChange={(value) => setSelectedYear(Number(value))}
-                    defaultValue={selectedYear.toString()}
-                  >
-                    <SelectTrigger 
-                     className="
-                      flex 
-                      items-center 
-                      gap-1 
-                      px-4 
-                      py-2 
-                      bg-gray-100/70 
-                      backdrop-blur-md 
-                      rounded-xl 
-                      font-medium 
-                      shadow-sm 
-                      w-fit 
-                      hover:bg-gray-200/70 
-                      transition
-                    ">
-                      <SelectValue placeholder="Ano" />
-                    </SelectTrigger>
-                    <SelectContent 
-                     className="
-                      bg-white/80 
-                      backdrop-blur-md 
-                      border 
-                      border-gray-200 
-                      shadow-lg 
-                      rounded-xl 
-                      animate-in 
-                      fade-in-50 
-                      zoom-in-95
-                    ">
-                      {Array.from({ length: 6 }).map((_, i) => {
-                        const y = 2023 + i;
-                        return (
-                          <SelectItem
-                            key={y}
-                            value={y.toString()}
-                            className="
-                             hover:bg-blue-100/60 
-                             rounded-md 
-                             px-2 
-                             py-1 
-                             cursor-pointer 
-                             transition
-                             ">
-                            {y}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+                    </svg>
+                  </div>
+                  <h1 className="text-neutral-100 text-xl font-bold tracking-tight">
+                    Timely
+                  </h1>
                 </div>
+              </motion.div>
 
-                {/* Calendário */}
-                <CalendarGrid month={selectedMonth} year={selectedYear} />
-              </div>
+              {/* Navigation */}
+              <nav className="space-y-2 pb-12 relative z-10">
+                <SidebarItem label="Dashboard" active />
+                <SidebarItem label="Estatísticas" icon="chart" />
+                <SidebarItem label="Calendário" icon="calendar" />
+                <SidebarItem label="Configurações" icon="settings" />
+              </nav>
 
-              {/* Estatísticas */}
-              <div className="space-y-4">
-                <StatCard
-                  title="Eventos este mês"
-                  value="12"
-                  subtitle="+3 em relação ao mês passado"
-                />
+              {/* User Profile */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mt-auto relative z-10"
+              >
+                <div 
+                  className="flex items-center gap-4 p-4 rounded-2xl backdrop-blur-sm transition-all duration-300 hover:bg-white/10"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <div className="relative">
+                    <div className="h-12 w-12 rounded-full overflow-hidden ring-2 ring-white/20">
+                      <div 
+                        className="w-full h-full rounded-full flex items-center justify-center text-white text-lg font-bold"
+                      >
+                        <img src="../images/Jhon-Doe.png" alt="Jhon Doe Profile Picture" />
+                      </div>
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full border-2 border-white/20" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-neutral-100 font-semibold text-sm">
+                      John Doe
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="px-2 py-0.5 rounded-md text-xs font-medium"
+                        style={{ 
+                          background: COLORS.gradient,
+                          color: 'white'
+                        }}
+                      >
+                        Premium
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.aside>
+
+            {/* MAIN Content */}
+            <main className="flex-1 p-6 space-y-6 overflow-auto bg-gradient-to-br from-slate-50/50 to-white/50">
+              {/* Header Premium */}
+              <motion.header 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="flex justify-between items-center"
+              >
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                    Seu Calendário
+                  </h1>
+                  <p className="text-slate-500 mt-1 text-sm">
+                    {new Date().toLocaleDateString('pt-BR', { 
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+                
+                <button
+                  className="group relative px-5 py-2.5 rounded-xl text-white font-semibold shadow-lg overflow-hidden transition-all duration-200 hover:scale-105"
+                  style={{ background: COLORS.gradient }}
+                >
+                  <div className="flex items-center gap-2 relative z-10">
+                    <svg width="16" height="16" viewBox="0 0 24 24" className="text-white">
+                      <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    Adicionar Evento
+                  </div>
+                </button>
+              </motion.header>
+
+              {/* Grid principal melhorado */}
+              <div className="grid grid-cols-3 gap-6">
+                {/* Calendário Premium */}
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="rounded-2xl p-6"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="col-span-2 rounded-2xl p-5 transition-all duration-200 hover:shadow-lg group"
                   style={{
                     background: COLORS.card,
                     border: `1px solid ${COLORS.border}`,
-                    boxShadow: "0 6px 24px rgba(2,6,23,0.04)",
+                    boxShadow: "0 4px 16px rgba(11,27,47,0.06)",
                   }}
                 >
-                  <p
-                    className="text-sm font-medium mb-4"
-                    style={{ color: COLORS.textMuted }}
-                  >
-                    Agendamentos Mensais
-                  </p>
-                  <div className="h-[150px] flex items-center flex-col justify-center">
-                    <ResponsiveContainer width="100%" height="80%">
-                      <LineChart data={chartData}>
-                        <CartesianGrid
-                          strokeDasharray="2 2"
-                          stroke={COLORS.border}
-                        />
-                        <XAxis dataKey="month" stroke={COLORS.textMuted} />
-                        <YAxis stroke={COLORS.textMuted} />
-                        <Tooltip />
-                        <Line
-                          type="monotone"
-                          dataKey="agendamentos"
-                          stroke={COLORS.blue}
-                          strokeWidth={1}
-                          dot={{ r: 2.5, fill: COLORS.blue }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                  {/* Header do calendário */}
+                  <div className="flex items-center justify-between mb-4">
+                    <PremiumSelect
+                      value={selectedMonth}
+                      onValueChange={setSelectedMonth}
+                      options={[
+                        "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+                        "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+                      ]}
+                    />
+                    <PremiumSelect
+                      value={selectedYear}
+                      onValueChange={setSelectedYear}
+                      options={Array.from({ length: 6 }, (_, i) => (2023 + i).toString())}
+                    />
                   </div>
+
+                  <CalendarGrid month={selectedMonth} year={selectedYear} />
                 </motion.div>
-                <StatCard
-                  title="Reuniões concluídas"
-                  value="9"
-                  subtitle="Taxa de 90%"
-                />
+
+                {/* Estatísticas Premium */}
+                <div className="space-y-4">
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                    onHoverStart={() => setHoveredStat(0)}
+                    onHoverEnd={() => setHoveredStat(null)}
+                  >
+                    <StatCard
+                      title="Eventos este mês"
+                      value="12"
+                      subtitle="+25% vs mês anterior"
+                      icon="calendar"
+                      isHovered={hoveredStat === 0}
+                    />
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 }}
+                    className="rounded-2xl p-5 group transition-all duration-200 hover:shadow-lg"
+                    style={{
+                      background: COLORS.card,
+                      border: `1px solid ${COLORS.border}`,
+                      boxShadow: "0 4px 16px rgba(11,27,47,0.06)",
+                    }}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div 
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ background: `${COLORS.blue}15` }}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" style={{ color: COLORS.blue }}>
+                          <path
+                            fill="currentColor"
+                            d="M3 21v-2h18v2H3Zm2-4V7h3v10H5Zm5 0V3h3v14h-3Zm5 0V10h3v7h-3Z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-base font-semibold text-slate-800">
+                        Tendência Anual
+                      </h3>
+                    </div>
+                    
+                    <div className="h-[140px] -mx-1">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={chartData}>
+                          <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0.05}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.2)" />
+                          <XAxis 
+                            dataKey="month" 
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fontSize: 11, fill: COLORS.textMuted }}
+                          />
+                          <YAxis 
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fontSize: 11, fill: COLORS.textMuted }}
+                          />
+                          <Tooltip 
+                            contentStyle={{
+                              background: 'rgba(255,255,255,0.95)',
+                              border: 'none',
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                              fontSize: '12px'
+                            }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="agendamentos"
+                            stroke={COLORS.blue}
+                            strokeWidth={2}
+                            fill="url(#gradient)"
+                            dot={{ r: 3, fill: COLORS.blue, strokeWidth: 1, stroke: 'white' }}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 }}
+                    onHoverStart={() => setHoveredStat(1)}
+                    onHoverEnd={() => setHoveredStat(null)}
+                  >
+                    <StatCard
+                      title="Taxa de Conclusão"
+                      value="94%"
+                      subtitle="Excelente performance"
+                      icon="check"
+                      isHovered={hoveredStat === 1}
+                    />
+                  </motion.div>
+                </div>
               </div>
-            </div>
-          </main>
+            </main>
+          </motion.div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
 
-/* ------------------------------- Components ------------------------------- */
+/* ------------------------------- Components Premium ------------------------------- */
 
 function SidebarItem({
   label,
@@ -433,15 +371,19 @@ function SidebarItem({
 }: {
   label: string;
   active?: boolean;
-  icon?: "chart" | "user";
+  icon?: "chart" | "calendar" | "settings";
 }) {
   return (
-    <button
-      className={`w-full flex items-center gap-3 rounded-2xl px-4 py-3 transition ${
-        active ? "bg-white/10" : "hover:bg-white/5"
+    <motion.button
+      className={`w-full flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 group ${
+        active 
+          ? "bg-white/15 shadow-md" 
+          : "hover:bg-white/8"
       }`}
     >
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10">
+      <div className={`inline-flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200 ${
+        active ? "bg-white/20 shadow-sm" : "bg-white/10 group-hover:bg-white/15"
+      }`}>
         {icon === "chart" && (
           <svg width="18" height="18" viewBox="0 0 24 24" className="text-white">
             <path
@@ -450,93 +392,114 @@ function SidebarItem({
             />
           </svg>
         )}
-        {icon === "user" && (
+        {icon === "calendar" && (
           <svg width="18" height="18" viewBox="0 0 24 24" className="text-white">
             <path
               fill="currentColor"
-              d="M12 12a5 5 0 1 0-5-5a5 5 0 0 0 5 5Zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5Z"
+              d="M7 11h2v2H7v-2zm0 4h2v2H7v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"
+            />
+            <path
+              fill="currentColor"
+              d="M5 22h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2zM5 7h14v13H5V7z"
+            />
+          </svg>
+        )}
+        {icon === "settings" && (
+          <svg width="18" height="18" viewBox="0 0 24 24" className="text-white">
+            <path
+              fill="currentColor"
+              d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5a3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"
             />
           </svg>
         )}
         {!icon && (
           <svg width="18" height="18" viewBox="0 0 24 24" className="text-white">
-            <path fill="currentColor" d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8Z" />
+            <path
+              fill="currentColor"
+              d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5Z"
+            />
           </svg>
         )}
-      </span>
-      <span className="text-white font-medium">{label}</span>
-    </button>
+      </div>
+      <span className="text-white font-semibold">{label}</span>
+    </motion.button>
   );
 }
 
-function InfoHeader({
-  month,
-  year,
-  onMonthChange,
-  onYearChange,
+function PremiumSelect({
+  value,
+  onValueChange,
+  options,
 }: {
-  month: number;
-  year: number;
-  onMonthChange: (m: number) => void;
-  onYearChange: (y: number) => void;
+  value: number;
+  onValueChange: (value: number) => void;
+  options: string[];
 }) {
-  const months = [
-    "Janeiro",
-    "Fevereiro",
-    "Março",
-    "Abril",
-    "Maio",
-    "Junho",
-    "Julho",
-    "Agosto",
-    "Setembro",
-    "Outubro",
-    "Novembro",
-    "Dezembro",
-  ];
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl p-3 flex items-center justify-between gap-4"
-      style={{
-        background: COLORS.card,
-        border: `1px solid ${COLORS.border}`,
-      }}
-    >
-      <button
-        className="px-3 py-1 rounded-lg text-white"
-        style={{ background: COLORS.blue }}
-        onClick={() => onMonthChange((month - 1 + 12) % 12)}
+    <div className="relative">
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-3 px-5 py-3 rounded-2xl font-semibold transition-all duration-300 hover:shadow-md group"
+        style={{
+          background: `linear-gradient(135deg, ${COLORS.accent} 0%, rgba(248,250,252,0.8) 100%)`,
+          border: `1px solid ${COLORS.borderLight}`,
+        }}
       >
-        {"<"}
-      </button>
-      <div className="flex items-center gap-3">
-        <span className="font-semibold">{months[month]}</span>
-        <select
-          value={year}
-          onChange={(e) => onYearChange(Number(e.target.value))}
-          className="border rounded-lg px-2 py-1 text-sm"
+        <span className="text-slate-800">{options[value]}</span>
+        <motion.svg
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          className="text-slate-600"
         >
-          {Array.from({ length: 6 }).map((_, i) => {
-            const y = 2023 + i;
-            return (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            );
-          })}
-        </select>
-      </div>
-      <button
-        className="px-3 py-1 rounded-lg text-white"
-        style={{ background: COLORS.blue }}
-        onClick={() => onMonthChange((month + 1) % 12)}
-      >
-        {">"}
-      </button>
-    </motion.div>
+          <path
+            fill="currentColor"
+            d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6l1.41-1.42Z"
+          />
+        </motion.svg>
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            className="absolute top-full mt-2 left-0 right-0 rounded-2xl overflow-hidden z-50"
+            style={{
+              background: 'rgba(255,255,255,0.9)',
+              border: '1px solid rgba(255,255,255,0.5)',
+              boxShadow: `
+                0 20px 60px rgba(11,27,47,0.15),
+                inset 0 1px 0 rgba(255,255,255,1),
+                0 1px 0 rgba(0,0,0,0.05)
+              `,
+              backdropFilter: "blur(40px) saturate(180%)",
+              zIndex: 9999,
+            }}
+          >
+            {options.map((option, index) => (
+              <motion.button
+                key={index}
+                whileHover={{ backgroundColor: "rgba(79,125,255,0.08)" }}
+                onClick={() => {
+                  onValueChange(index);
+                  setIsOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left text-slate-800 font-medium transition-colors duration-200 first:rounded-t-2xl last:rounded-b-2xl"
+              >
+                {option}
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -544,141 +507,306 @@ function StatCard({
   title,
   value,
   subtitle,
+  icon,
+  isHovered,
 }: {
   title: string;
   value: string;
   subtitle: string;
+  icon: string;
+  isHovered: boolean;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
-      className="rounded-2xl p-6"
+      className="rounded-2xl p-5 group transition-all duration-200 hover:shadow-lg hover:scale-102"
       style={{
         background: COLORS.card,
-        border: `1px solid ${COLORS.border}`,
-        boxShadow: "0 6px 24px rgba(2,6,23,0.04)",
+        border: `1px solid ${isHovered ? COLORS.blue + '30' : COLORS.border}`,
+        boxShadow: isHovered 
+          ? "0 12px 40px rgba(79,125,255,0.15)" 
+          : "0 4px 16px rgba(11,27,47,0.06)",
       }}
     >
-      <p className="text-sm font-medium mb-2" style={{ color: COLORS.textMuted }}>
-        {title}
-      </p>
-      <div className="text-4xl font-extrabold" style={{ color: COLORS.navy }}>
-        {value}
+      <div className="flex items-center gap-3 mb-3">
+        <div 
+          className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200"
+          style={{ 
+            backgroundColor: isHovered ? COLORS.blue + '20' : COLORS.blue + '15'
+          }}
+        >
+          {icon === "calendar" && (
+            <svg width="20" height="20" viewBox="0 0 24 24" style={{ color: COLORS.blue }}>
+              <path
+                fill="currentColor"
+                d="M7 11h2v2H7v-2zm0 4h2v2H7v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"
+              />
+            </svg>
+          )}
+          {icon === "check" && (
+            <svg width="20" height="20" viewBox="0 0 24 24" style={{ color: COLORS.blue }}>
+              <path
+                fill="currentColor"
+                d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41L9 16.17z"
+              />
+            </svg>
+          )}
+        </div>
+        <h3 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">
+          {title}
+        </h3>
       </div>
-      <p className="mt-1 text-base" style={{ color: COLORS.blue }}>
-        {subtitle}
-      </p>
+      
+      <div className="space-y-1">
+        <div 
+          className="text-3xl font-black bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent"
+        >
+          {value}
+        </div>
+        <p className="text-sm font-medium" style={{ color: COLORS.blue }}>
+          {subtitle}
+        </p>
+      </div>
     </motion.div>
   );
 }
 
-/* ---------------- Calendar with Modal ---------------- */
+/* ---------------- Calendar Premium ---------------- */
 
 function CalendarGrid({ month, year }: { month: number; year: number }) {
   const [hoveredEvent, setHoveredEvent] = useState<CalendarEvent | null>(null);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayOfWeek = new Date(year, month, 1).getDay();
+  const adjustedFirstDay = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
+  const eventTypeColors = {
+    meeting: COLORS.blue,
+    interview: '#F59E0B',
+    lunch: '#10B981',
+    review: '#8B5CF6'
+  };
+
+  const handleMouseEnter = (event: CalendarEvent, e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePosition({
+      x: rect.left + rect.width / 2,
+      y: rect.bottom + 12
+    });
+    setHoveredEvent(event);
+  };
 
   return (
-    <div className="mt-4 grid grid-cols-7 gap-2 relative">
-      {/* Cabeçalho (dias da semana) */}
-      {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map((d) => (
-        <p
-          key={d}
-          className="text-sm font-medium text-center"
-          style={{ color: COLORS.textMuted }}
-        >
-          {d}
-        </p>
-      ))}
-
-      {/* Dias */}
-      {Array.from({ length: daysInMonth }).map((_, i) => {
-        const dayNumber = i + 1;
-        const events = calendarEvents.filter((e) => e.day === dayNumber);
-        const event = events[0];
-
-        return (
+    <div className="mt-4 space-y-3">
+      {/* Cabeçalho dos dias da semana */}
+      <div className="grid grid-cols-7 gap-2">
+        {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map((d) => (
           <div
-            key={i}
-            className={`h-20 border border-dashed rounded-lg flex items-center justify-center text-sm relative cursor-pointer`}
-            style={{
-              borderColor: COLORS.border,
-              color: event ? "white" : COLORS.textMuted,
-              background: event ? COLORS.blue : "transparent",
+            key={d}
+            className="text-xs font-bold text-center py-2 rounded-xl transition-all duration-200"
+            style={{ 
+              color: COLORS.textMuted,
+              background: 'rgba(255,255,255,0.4)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(10px) saturate(150%)',
             }}
-            onMouseEnter={() => event && setHoveredEvent(event)}
-            onMouseLeave={() => setHoveredEvent(null)}
-            onClick={() => setSelectedDay(dayNumber)}
           >
-            {dayNumber}
-
-            {/* Popover (hover) */}
-            {hoveredEvent?.day === dayNumber && (
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 p-3 rounded-xl shadow-lg text-sm"
-                style={{
-                  background: COLORS.card,
-                  border: `1px solid ${COLORS.border}`,
-                  color: COLORS.text,
-                  minWidth: "180px",
-                }}
-              >
-                <p className="font-semibold">{hoveredEvent.title}</p>
-                <p className="text-xs text-gray-500">{hoveredEvent.time}</p>
-              </motion.div>
-            )}
+            {d}
           </div>
-        );
-      })}
+        ))}
+      </div>
 
-      {/* Modal de eventos do dia */}
+      {/* Grid do calendário */}
+      <div className="grid grid-cols-7 gap-2 relative">
+        {/* Espaços vazios para o primeiro dia do mês */}
+        {Array.from({ length: adjustedFirstDay }).map((_, i) => (
+          <div key={`empty-${i}`} className="h-16" />
+        ))}
+
+        {/* Dias do mês */}
+        {Array.from({ length: daysInMonth }).map((_, i) => {
+          const dayNumber = i + 1;
+          const dayEvents = calendarEvents.filter((e) => e.day === dayNumber);
+          const hasEvents = dayEvents.length > 0;
+          const primaryEvent = dayEvents[0];
+
+          return (
+            <motion.div
+              key={dayNumber}
+              whileHover={{ scale: 1.05, y: -3 }}
+              whileTap={{ scale: 0.96 }}
+              className="h-20 rounded-2xl flex flex-col items-center justify-center text-sm relative cursor-pointer group transition-all duration-300"
+              style={{
+                background: hasEvents 
+                  ? `rgba(255,255,255,0.85)`
+                  : 'rgba(255,255,255,0.6)',
+                border: hasEvents 
+                  ? `2px solid ${eventTypeColors[primaryEvent.type]}40`
+                  : '1px solid rgba(255,255,255,0.3)',
+                color: hasEvents ? eventTypeColors[primaryEvent.type] : COLORS.textMuted,
+                boxShadow: hasEvents 
+                  ? `
+                      0 8px 32px ${eventTypeColors[primaryEvent.type]}20,
+                      inset 0 1px 0 rgba(255,255,255,0.9),
+                      0 1px 0 rgba(0,0,0,0.05)
+                    `
+                  : `
+                      0 4px 16px rgba(148,163,184,0.1),
+                      inset 0 1px 0 rgba(255,255,255,0.8),
+                      0 1px 0 rgba(0,0,0,0.03)
+                    `,
+                backdropFilter: 'blur(20px) saturate(180%)',
+              }}
+              onMouseEnter={(e) => primaryEvent && handleMouseEnter(primaryEvent, e)}
+              onMouseLeave={() => setHoveredEvent(null)}
+              onClick={() => setSelectedDay(dayNumber)}
+            >
+              <span className={`font-bold ${hasEvents ? 'text-lg' : 'text-base'} transition-all duration-300`}>
+                {dayNumber}
+              </span>
+              
+              {hasEvents && (
+                <div className="flex gap-1 mt-1">
+                  {dayEvents.slice(0, 3).map((_, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-2 h-2 rounded-full"
+                      style={{ background: eventTypeColors[dayEvents[idx].type] }}
+                    />
+                  ))}
+                  {dayEvents.length > 3 && (
+                    <span className="text-xs font-bold">+{dayEvents.length - 3}</span>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
+
+        {/* Tooltips otimizados */}
+        {hoveredEvent && (
+          <div 
+            className="fixed pointer-events-none"
+            style={{ 
+              zIndex: 10000,
+              left: mousePosition.x,
+              top: mousePosition.y,
+              transform: 'translateX(-50%)'
+            }}
+          >
+            <div
+              className="p-3 rounded-xl shadow-lg min-w-[180px]"
+              style={{
+                background: 'rgba(255,255,255,0.95)',
+                border: `1px solid rgba(255,255,255,0.4)`,
+                boxShadow: '0 8px 32px rgba(11,27,47,0.2)',
+                backdropFilter: "blur(20px) saturate(180%)",
+              }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <div 
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: eventTypeColors[hoveredEvent.type] }}
+                />
+                <p className="font-bold text-slate-800 text-sm">{hoveredEvent.title}</p>
+              </div>
+              <p className="text-xs text-slate-600">{hoveredEvent.time}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal simplificado */}
       <AnimatePresence>
         {selectedDay && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 flex items-center justify-center bg-black/40 z-50"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setSelectedDay(null)}
           >
             <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="max-w-md w-full mx-4 rounded-2xl p-6 relative"
+              style={{
+                background: COLORS.cardHover,
+                border: `1px solid ${COLORS.border}`,
+                boxShadow: "0 20px 60px rgba(11,27,47,0.3)",
+              }}
             >
-              <h2 className="text-lg font-bold mb-4">
-                Eventos do dia {selectedDay}
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-slate-800">
+                  {selectedDay} de {["Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+                    "Jul", "Ago", "Set", "Out", "Nov", "Dez"][month]}
+                </h2>
+                <button
+                  onClick={() => setSelectedDay(null)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 hover:bg-slate-100"
+                  style={{ color: COLORS.blue }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"/>
+                  </svg>
+                </button>
+              </div>
+
               {calendarEvents.filter((e) => e.day === selectedDay).length > 0 ? (
-                <ul className="space-y-3">
+                <div className="space-y-3">
                   {calendarEvents
                     .filter((e) => e.day === selectedDay)
-                    .map((ev, idx) => (
-                      <li
+                    .map((event, idx) => (
+                      <div
                         key={idx}
-                        className="p-3 rounded-lg border"
-                        style={{ borderColor: COLORS.border }}
+                        className="flex items-center gap-3 p-3 rounded-xl transition-all duration-200 hover:shadow-sm"
+                        style={{
+                          background: `${eventTypeColors[event.type]}08`,
+                          border: `1px solid ${eventTypeColors[event.type]}20`,
+                        }}
                       >
-                        <p className="font-medium">{ev.title}</p>
-                        <p className="text-sm text-gray-500">{ev.time}</p>
-                      </li>
+                        <div 
+                          className="w-8 h-8 rounded-lg flex items-center justify-center"
+                          style={{ background: `${eventTypeColors[event.type]}20` }}
+                        >
+                          <div 
+                            className="w-4 h-4 rounded-full"
+                            style={{ background: eventTypeColors[event.type] }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-slate-800 text-sm">{event.title}</h3>
+                          <p className="text-xs text-slate-600">{event.time}</p>
+                        </div>
+                      </div>
                     ))}
-                </ul>
+                </div>
               ) : (
-                <p className="text-gray-500">Nenhum evento neste dia.</p>
+                <div className="text-center py-8">
+                  <div 
+                    className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: `${COLORS.blue}10` }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" style={{ color: COLORS.blue }}>
+                      <path fill="currentColor" d="M7 11h2v2H7v-2zm0 4h2v2H7v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/>
+                    </svg>
+                  </div>
+                  <p className="text-slate-600">Nenhum evento</p>
+                </div>
               )}
+
               <button
-                onClick={() => setSelectedDay(null)}
-                className="mt-6 w-full py-2 rounded-lg text-white"
-                style={{ background: COLORS.blue }}
+                className="w-full mt-4 py-3 rounded-xl text-white font-semibold shadow-md transition-all duration-200 hover:shadow-lg"
+                style={{ background: COLORS.gradient }}
               >
-                Fechar
+                Adicionar Evento
               </button>
             </motion.div>
           </motion.div>

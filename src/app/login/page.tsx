@@ -18,7 +18,7 @@ export default function Login() {
                     <div className="login-auth-socials">
                         <FcGoogle />
                     </div>
-                    <div className="login-auth-socials text-neutral-600 hover:text-neutral-200">
+                    <div className="login-auth-socials text-neutral-400 hover:text-neutral-200">
                         <SiApple />
                     </div>
                     <div className="login-auth-socials text-blue-600">
@@ -36,7 +36,7 @@ export default function Login() {
                      className="login-input" />
                 </div>
                 <div className="flex flex-col items-center gap-6 pb-4">
-                    <button className="bg-neutral-900 rounded-xl text-neutral-200 p-4 px-7 text-lg hover:border hover:border-neutral-950 hover:bg-transparent hover:text-neutral-950 transition-colors ease-in-out duration-200 hover:shadow-xl cursor-pointer"><Link href="/">Login now</Link></button>
+                    <button className="bg-blue-600 rounded-xl text-neutral-200 p-4 px-7 text-lg hover:border hover:border-neutral-950 hover:bg-transparent hover:text-neutral-950 transition-all ease-in-out duration-200 cursor-pointer"><Link href="/">Iniciar sessão</Link></button>
                     <div className="">
                         <p className="cursor-default">Não tem cadastro? <Link href="/register" className="text-neutral-600 underline cursor-pointer">Registre-se agora</Link></p>
                     </div>
@@ -48,12 +48,12 @@ export default function Login() {
                     <Link href="/" className="mobile-logo">LNNO</Link>
                     <h1 className="font-light text-lg capitalize">Your Account</h1>
                 </div>
-                <div className="w-[60%] h-0.5 rounded-full bg-neutral-950"></div>
+                <div className="w-[60%] h-0.5 rounded-full bg-blue-600"></div>
                  <div className="flex flex-row items-center gap-2 py-4">
                     <div className="mobile-auth-socials">
                         <FcGoogle />
                     </div>
-                    <div className="mobile-auth-socials text-neutral-600">
+                    <div className="mobile-auth-socials text-blue-600">
                         <SiApple />
                     </div>
                     <div className="mobile-auth-socials text-blue-600">
@@ -71,7 +71,7 @@ export default function Login() {
                      className="mobile-login-input" />
                 </div>
                 <div className="flex flex-col items-center gap-4">
-                    <button className="bg-neutral-900 rounded-xl text-neutral-200 p-3 px-5 text-base hover:border hover:border-neutral-950 hover:bg-transparent hover:text-neutral-950 transition-colors ease-in-out duration-200 hover:shadow-xl cursor-pointer"><Link href="/">Login now</Link></button>
+                    <button className="bg-blue-600 rounded-xl text-neutral-200 p-3 px-5 text-base hover:border hover:border-neutral-950 hover:bg-transparent hover:text-neutral-950 transition-colors ease-in-out duration-200 hover:shadow-xl cursor-pointer"><Link href="/">Login now</Link></button>
                     <div className="text-sm pb-3">
                         <p className="cursor-default">Don't have an account? <Link href="/register" className="text-neutral-600 underline cursor-pointer">Register now</Link></p>
                     </div>
