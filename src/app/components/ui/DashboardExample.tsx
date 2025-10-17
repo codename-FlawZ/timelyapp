@@ -3,8 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import {
-  LineChart,
-  Line,
   CartesianGrid,
   XAxis,
   YAxis,
@@ -13,10 +11,13 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import Image from "next/image";
+import LogoCheck from "/public/images/Logo-nobg.png";
 
 /** Paleta Timely Premium */
 const COLORS = {
   navy: "#0B1B2F",
+  test:"#FFFFFF",
   blue: "#4F7DFF",
   blueLight: "#6B8AFF",
   text: "#111827",
@@ -96,7 +97,7 @@ export default function PremiumDashboard() {
               transition={{ duration: 0.4, delay: 0.1 }}
               className="w-[250px] shrink-0 p-6 flex flex-col relative overflow-hidden"
               style={{ 
-                background: `linear-gradient(180deg, ${COLORS.navy} 0%, #0F1F33 100%)`,
+                background: `linear-gradient(120deg, #1e3a8a 0%, #020617 100%)`,
               }}
             >
               {/* Gradient Overlay */}
@@ -109,22 +110,7 @@ export default function PremiumDashboard() {
                 transition={{ delay: 0.2 }}
                 className="flex justify-start items-center pb-8 relative z-10"
               >
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
-                    style={{ background: COLORS.gradient }}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" className="text-white">
-                      <path
-                        fill="currentColor"
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-                      />
-                    </svg>
-                  </div>
-                  <h1 className="text-neutral-100 text-xl font-bold tracking-tight">
-                    Timely
-                  </h1>
-                </div>
+                <Image src={LogoCheck} alt="" width={120} height={120}/>
               </motion.div>
 
               {/* Navigation */}

@@ -45,7 +45,7 @@ export default function Navbar({ heroRef, threshold = 0.5 }: NavbarProps) {
       <motion.div
         layout
         className="flex items-center justify-between gap-6 
-          px-6 py-2 rounded-full
+          px-8 py-3.5 rounded-full
           backdrop-blur-xl bg-neutral-100/20  
           shadow-[0_4px_30px_rgba(0,0,0,0.1)]
           border border-neutral-100/20"
@@ -55,8 +55,8 @@ export default function Navbar({ heroRef, threshold = 0.5 }: NavbarProps) {
           <Image
             src={IconCheck}
             alt="Timely logo"
-            width={80}
-            height={80}
+            width={35}
+            height={50}
             className="mr-3 flex relative z-10"
           />
         </motion.div>

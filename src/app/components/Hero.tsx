@@ -6,6 +6,9 @@ import GlassTag from "./ui/GlassTag";
 import Calendar from "./ui/Calendar";
 import Navbar from "./ui/Navbar";
 import Link from "next/link";
+import Image from "next/image";
+
+import LogoCheck from "/public/images/Logo-nobg.png";
 
 export default function Hero() {
   const heroRef = useRef<HTMLElement | null>(null);
@@ -24,11 +27,18 @@ export default function Hero() {
           initial={{ y: 0, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex justify-between items-center px-6 md:px-10 pb-10"
+          className="flex justify-between items-center px-6 md:px-1 pb-16"
         >
-          <h1 className="text-2xl font-bold text-gray-800">Timely</h1>
+          <Image 
+          src={LogoCheck} 
+          alt="Timely Logo"
+          width={120}
+          height={120}
+          className="flex relative"
+          />
 
-          <nav className="hidden md:flex gap-8 text-gray-700 font-medium">
+          <div className="inline-flex flex-row items-center gap-5">
+            <nav className="hidden md:flex gap-5 text-gray-700 font-medium">
             {["Sobre", "Planos", "Contato"].map((item) => (
               <a
                 key={item}
@@ -42,10 +52,11 @@ export default function Hero() {
 
           <button
             aria-label="Começar agora"
-            className="bg-blue-500 text-white font-medium rounded-xl px-6 py-2 shadow-md hover:bg-blue-600 transition-colors"
+            className="bg-blue-500 text-white font-medium rounded-xl ml-4 px-6 py-2 shadow-md hover:bg-blue-600 transition-colors"
           >
             <Link href="/login">Experimente Agora</Link>
           </button>
+          </div>
         </motion.header>
 
         {/* Hero Content */}
